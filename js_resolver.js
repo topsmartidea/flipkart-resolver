@@ -5,15 +5,10 @@ const app = express();
 
 let browser;
 
-// 🔥 Start server with browser
 async function startServer() {
   try {
 
-    // ✅ Chrome path (Render specific)
-    const chromePath = "/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome";
-
     browser = await puppeteer.launch({
-      executablePath: chromePath,
       headless: true,
       args: [
         "--no-sandbox",
@@ -38,17 +33,16 @@ async function startServer() {
   }
 }
 
-// 🔥 Root check
+// routes
 app.get("/", (req, res) => {
-  res.send("Flipkart Resolver API Running ✅");
+  res.send("API Running ✅");
 });
 
-// 🔥 Resolver API
 app.get("/resolve", async (req, res) => {
 
   if (!browser) {
     return res.json({
-      error: "browser not initialized (hosting issue)"
+      error: "browser not initialized (startup issue)"
     });
   }
 
@@ -63,16 +57,11 @@ app.get("/resolve", async (req, res) => {
   try {
     page = await browser.newPage();
 
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
-    );
-
     await page.goto(url, {
       waitUntil: "networkidle2",
       timeout: 30000
     });
 
-    // wait for redirect
     await new Promise(r => setTimeout(r, 5000));
 
     const finalUrl = page.url();
@@ -83,17 +72,14 @@ app.get("/resolve", async (req, res) => {
     });
 
   } catch (e) {
-
     res.json({
       error: "resolver failed",
       message: e.message
     });
-
   } finally {
     if (page) await page.close();
   }
 
 });
 
-// 🔥 Start
 startServer();
