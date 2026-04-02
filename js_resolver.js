@@ -5,14 +5,17 @@ const app = express();
 
 let browser;
 
+// 🔥 Launch browser safely
 (async () => {
   try {
     browser = await puppeteer.launch({
-      headless: "new",
+      headless: true,
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH, // 🔥 important for Render
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
-        "--disable-blink-features=AutomationControlled"
+        "--disable-dev-shm-usage",
+        "--disable-gpu"
       ]
     });
 
@@ -23,10 +26,14 @@ let browser;
   }
 })();
 
+
+// 🔥 Root check
 app.get("/", (req, res) => {
-  res.send("API Running ✅");
+  res.send("Flipkart Resolver API Running ✅");
 });
 
+
+// 🔥 Resolver API
 app.get("/resolve", async (req, res) => {
 
   if (!browser) {
@@ -55,28 +62,33 @@ app.get("/resolve", async (req, res) => {
       timeout: 30000
     });
 
-    await new Promise(r => setTimeout(r, 4000));
+    // 🔥 wait for redirect
+    await new Promise(r => setTimeout(r, 5000));
 
-    const final = page.url();
+    const finalUrl = page.url();
+
+    await page.close();
 
     res.json({
       success: true,
-      final_url: final
+      final_url: finalUrl
     });
 
   } catch (e) {
+
+    if (page) await page.close();
 
     res.json({
       error: "resolver failed",
       message: e.message
     });
 
-  } finally {
-    if (page) await page.close();
   }
 
 });
 
+
+// 🔥 PORT fix (important for Render)
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
