@@ -14,7 +14,7 @@
     "puppeteer",
     "affiliate"
   ],
-  "author": "your-name",
+  "author": "topsmartidea",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
