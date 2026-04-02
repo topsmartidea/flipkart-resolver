@@ -5,8 +5,8 @@ const app = express();
 
 let browser;
 
-// 🔥 Launch browser safely
-(async () => {
+// 🔥 Start everything properly
+async function startServer() {
   try {
     browser = await puppeteer.launch({
       headless: true,
@@ -22,10 +22,16 @@ let browser;
 
     console.log("🚀 Browser Ready");
 
+    const PORT = process.env.PORT || 3000;
+
+    app.listen(PORT, () => {
+      console.log("Server running on " + PORT);
+    });
+
   } catch (e) {
     console.error("❌ Browser launch failed:", e.message);
   }
-})();
+}
 
 // 🔥 Root check
 app.get("/", (req, res) => {
@@ -37,7 +43,7 @@ app.get("/resolve", async (req, res) => {
 
   if (!browser) {
     return res.json({
-      error: "browser not initialized (hosting issue)"
+      error: "browser not initialized (startup issue)"
     });
   }
 
@@ -61,7 +67,6 @@ app.get("/resolve", async (req, res) => {
       timeout: 30000
     });
 
-    // 🔥 wait for redirect
     await new Promise(r => setTimeout(r, 5000));
 
     const finalUrl = page.url();
@@ -84,9 +89,5 @@ app.get("/resolve", async (req, res) => {
 
 });
 
-// 🔥 PORT fix (Render)
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log("Server running on " + PORT);
-});
+// 🔥 Start server properly
+startServer();
