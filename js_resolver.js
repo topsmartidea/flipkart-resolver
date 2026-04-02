@@ -9,16 +9,16 @@ let browser;
 (async () => {
   try {
     browser = await puppeteer.launch({
-    headless: true,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-      "--single-process",
-      "--no-zygote"
-    ]
-  });
+      headless: true,
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--single-process",
+        "--no-zygote"
+      ]
+    });
 
     console.log("🚀 Browser Ready");
 
@@ -27,12 +27,10 @@ let browser;
   }
 })();
 
-
 // 🔥 Root check
 app.get("/", (req, res) => {
   res.send("Flipkart Resolver API Running ✅");
 });
-
 
 // 🔥 Resolver API
 app.get("/resolve", async (req, res) => {
@@ -68,8 +66,6 @@ app.get("/resolve", async (req, res) => {
 
     const finalUrl = page.url();
 
-    await page.close();
-
     res.json({
       success: true,
       final_url: finalUrl
@@ -77,19 +73,18 @@ app.get("/resolve", async (req, res) => {
 
   } catch (e) {
 
-    if (page) await page.close();
-
     res.json({
       error: "resolver failed",
       message: e.message
     });
 
+  } finally {
+    if (page) await page.close();
   }
 
 });
 
-
-// 🔥 PORT fix (important for Render)
+// 🔥 PORT fix (Render)
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
