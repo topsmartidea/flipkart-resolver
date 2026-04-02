@@ -5,10 +5,15 @@ const app = express();
 
 let browser;
 
-// 🔥 Start everything properly
+// 🔥 Start server with browser
 async function startServer() {
   try {
+
+    // ✅ Chrome path (Render specific)
+    const chromePath = "/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome";
+
     browser = await puppeteer.launch({
+      executablePath: chromePath,
       headless: true,
       args: [
         "--no-sandbox",
@@ -43,7 +48,7 @@ app.get("/resolve", async (req, res) => {
 
   if (!browser) {
     return res.json({
-      error: "browser not initialized (startup issue)"
+      error: "browser not initialized (hosting issue)"
     });
   }
 
@@ -67,6 +72,7 @@ app.get("/resolve", async (req, res) => {
       timeout: 30000
     });
 
+    // wait for redirect
     await new Promise(r => setTimeout(r, 5000));
 
     const finalUrl = page.url();
@@ -89,5 +95,5 @@ app.get("/resolve", async (req, res) => {
 
 });
 
-// 🔥 Start server properly
+// 🔥 Start
 startServer();
