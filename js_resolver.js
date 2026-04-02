@@ -1,50 +1,13 @@
 const express = require("express");
-const puppeteer = require("puppeteer");
+const axios = require("axios");
 
 const app = express();
 
-let browser;
-
-async function startServer() {
-  try {
-
-    browser = await puppeteer.launch({
-    headless: true,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-      "--single-process",
-      "--no-zygote"
-    ]
-  });
-
-    console.log("🚀 Browser Ready");
-
-    const PORT = process.env.PORT || 3000;
-
-    app.listen(PORT, () => {
-      console.log("Server running on " + PORT);
-    });
-
-  } catch (e) {
-    console.error("❌ Browser launch failed:", e.message);
-  }
-}
-
-// routes
 app.get("/", (req, res) => {
-  res.send("API Running ✅");
+  res.send("Flipkart Resolver API Running ✅");
 });
 
 app.get("/resolve", async (req, res) => {
-
-  if (!browser) {
-    return res.json({
-      error: "browser not initialized (startup issue)"
-    });
-  }
 
   const url = req.query.url;
 
@@ -52,19 +15,14 @@ app.get("/resolve", async (req, res) => {
     return res.json({ error: "url missing" });
   }
 
-  let page;
-
   try {
-    page = await browser.newPage();
 
-    await page.goto(url, {
-      waitUntil: "networkidle2",
-      timeout: 30000
+    const response = await axios.get(url, {
+      maxRedirects: 10,
+      validateStatus: null
     });
 
-    await new Promise(r => setTimeout(r, 5000));
-
-    const finalUrl = page.url();
+    const finalUrl = response.request.res.responseUrl;
 
     res.json({
       success: true,
@@ -76,10 +34,12 @@ app.get("/resolve", async (req, res) => {
       error: "resolver failed",
       message: e.message
     });
-  } finally {
-    if (page) await page.close();
   }
 
 });
 
-startServer();
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("Server running on " + PORT);
+});
