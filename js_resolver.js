@@ -10,7 +10,6 @@ let browser;
   try {
     browser = await puppeteer.launch({
       headless: true,
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH, // 🔥 important for Render
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
