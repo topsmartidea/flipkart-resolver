@@ -1,23 +1,12 @@
 {
   "name": "flipkart-resolver",
   "version": "1.0.0",
-  "description": "Flipkart short link resolver using Puppeteer",
   "main": "js_resolver.js",
-  "type": "commonjs",
   "scripts": {
-    "start": "node js_resolver.js",
-    "postinstall": "PUPPETEER_CACHE_DIR=/opt/render/.cache/puppeteer npx puppeteer browsers install chrome"
+    "start": "node js_resolver.js"
   },
-  "keywords": [
-    "flipkart",
-    "resolver",
-    "puppeteer",
-    "affiliate"
-  ],
-  "author": "topsmartidea",
-  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
-    "puppeteer": "^22.0.0"
+    "axios": "^1.6.0"
   }
 }
